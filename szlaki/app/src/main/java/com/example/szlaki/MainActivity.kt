@@ -26,6 +26,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Timer
 
 data class OverpassResponse(val elements: List<TrailElement>)
 data class TrailElement(val id: Long, val tags: Map<String, String>?) {
@@ -114,7 +117,6 @@ fun MyApp() {
 fun HomeScreen(navController: NavController, vm: TrailsViewModel = viewModel()) {
     var typ by remember { mutableStateOf("gorskie") }
 
-    // Pobierz dane przy starcie lub zmianie typu
     LaunchedEffect(typ) {
         vm.fetchTrails(typ)
     }
@@ -176,12 +178,21 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel) {
             TopAppBar(
                 title = { Text("Szczegóły szlaku") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    Button(onClick = { navController.popBackStack() }) {
                         Text("<")
                     }
                 }
             )
-        }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { /* Twoja akcja tutaj */ },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Filled.Timer, contentDescription = "Stoper")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
     ) { padding ->
         if (trail == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
