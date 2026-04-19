@@ -29,77 +29,43 @@ import retrofit2.http.Query
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Timer
-
-data class OverpassResponse(val elements: List<TrailElement>)
-data class TrailElement(val id: Long, val tags: Map<String, String>?) {
-    val name: String get() = tags?.get("name") ?: "Szlak bez nazwy"
-    val type: String get() = tags?.get("route") ?: "nieznany"
-
-    val surface: String? get() = tags?.get("surface")
-    val difficulty: String? get() = tags?.get("sac_scale") ?: tags?.get("mtb:scale")
-    val color: String? get() = tags?.get("osmc:symbol")?.split(":")?.getOrNull(1)
-    val network: String? get() = tags?.get("network")
-    val operator: String? get() = tags?.get("operator")
-}
-
-interface OverpassApi {
-    @GET("interpreter")
-    suspend fun getTrails(@Query("data") query: String): OverpassResponse
-}
-
-object RetrofitClient {
-    val api: OverpassApi by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://overpass-api.de/api/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(OverpassApi::class.java)
-    }
-}
-
-class TrailsViewModel : ViewModel() {
-    var trails = mutableStateOf<List<TrailElement>>(emptyList())
-    var isLoading = mutableStateOf(false)
-    var selectedTrail = mutableStateOf<TrailElement?>(null)
-
-    fun fetchTrails(type: String) {
-        val osmTag = if (type == "gorskie") "hiking" else "bicycle"
-        val query = """
-            [out:json];
-            relation["route"="$osmTag"](49.1,19.7,49.3,20.2);
-            out body;
-        """.trimIndent()
-
-        val scope = viewModelScope
-        isLoading.value = true
-        scope.launch {
-            try {
-                val response = RetrofitClient.api.getTrails(query)
-                trails.value = response.elements.filter { it.tags?.containsKey("name") == true }
-            } catch (e: Exception) { }
-            finally {
-                isLoading.value = false
-            }
-        }
-    }
-}
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val database = AppDatabase.getInstance(this)
+        val repository = TrailRepository(database.trailDao())
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val dbTrails = repository.getTrailsByType("hiking")
+            // Sprawdzamy czy baza jest pusta z małym uproszczeniem
+            repository.insertTrails(
+                listOf(
+                    TrailEntity(name = "Szlak na Rysy", type = "hiking", color = "red", difficulty = "hard", surface = "rock", operator = "TPN"),
+                    TrailEntity(name = "Dolina Chochołowska", type = "hiking", color = "green", difficulty = "easy", surface = "gravel", operator = "TPN"),
+                    TrailEntity(name = "Velo Dunajec", type = "bicycle", color = "blue", difficulty = "medium", surface = "asphalt", operator = "Małopolska")
+                )
+            )
+        }
+
         enableEdgeToEdge()
         setContent {
             SzlakiTheme {
-                MyApp()
+                MyApp(repository)
             }
         }
     }
 }
 
 @Composable
-fun MyApp() {
+fun MyApp(repository: TrailRepository) {
     val navController = rememberNavController()
-    val vm: TrailsViewModel = viewModel()
+    val vm: TrailsViewModel = viewModel(
+        factory = TrailsViewModel.Factory(repository)
+    )
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
@@ -109,143 +75,5 @@ fun MyApp() {
         composable("details") {
             DetailsScreen(navController, vm)
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(navController: NavController, vm: TrailsViewModel = viewModel()) {
-    var typ by remember { mutableStateOf("gorskie") }
-
-    LaunchedEffect(typ) {
-        vm.fetchTrails(typ)
-    }
-
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("Szlaki") }) }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-            ) {
-                Button(onClick = { typ = "gorskie" }) { Text("Górskie") }
-                Button(onClick = { typ = "rowerowe" }) { Text("Rowerowe") }
-            }
-
-            val naglowek = if (typ == "gorskie") "Szlaki górskie" else "Szlaki rowerowe"
-            Text(
-                text = naglowek,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
-
-            if (vm.isLoading.value) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                    items(vm.trails.value) { trail ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                                .clickable {
-                                    vm.selectedTrail.value = trail
-                                    navController.navigate("details")
-                                }
-                        ) {
-                            Text(trail.name, modifier = Modifier.padding(16.dp))
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DetailsScreen(navController: NavController, vm: TrailsViewModel) {
-    val trail = vm.selectedTrail.value
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Szczegóły szlaku") },
-                navigationIcon = {
-                    Button(onClick = { navController.popBackStack() }) {
-                        Text("<")
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* Twoja akcja tutaj */ },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(Icons.Filled.Timer, contentDescription = "Stoper")
-            }
-        },
-        floatingActionButtonPosition = FabPosition.End
-    ) { padding ->
-        if (trail == null) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Nie znaleziono danych")
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(trail.name, style = MaterialTheme.typography.headlineMedium)
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    SuggestionChip(
-                        onClick = {},
-                        label = { Text(if (trail.type == "hiking") "Pieszy" else "Rowerowy") }
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    if (trail.color != null) {
-                        Text("Kolor: ${trail.color?.uppercase()}", fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
-
-                InfoRow(label = "Trudność", value = trail.difficulty ?: "Brak danych")
-                InfoRow(label = "Nawierzchnia", value = trail.surface ?: "Naturalna/Brak danych")
-                InfoRow(label = "Zarządca", value = trail.operator ?: "Lokalny")
-                InfoRow(label = "Ranga", value = translateNetwork(trail.network))
-            }
-        }
-    }
-}
-
-@Composable
-fun InfoRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(label, color = MaterialTheme.colorScheme.secondary)
-        Text(value, fontWeight = FontWeight.Medium)
-    }
-}
-
-fun translateNetwork(network: String?): String {
-    return when (network) {
-        "nwn" -> "Międzynarodowy"
-        "rwn" -> "Regionalny"
-        "lwn" -> "Lokalny"
-        else -> "Inny"
     }
 }
