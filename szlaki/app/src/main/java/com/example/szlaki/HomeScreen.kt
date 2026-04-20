@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -16,7 +18,7 @@ import com.example.szlaki.TrailsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController, vm: TrailsViewModel) {
-    var typ by remember { mutableStateOf("gorskie") }
+    val typ = vm.selectedTab.value
     val trails by vm.trails.observeAsState(initial = emptyList())
 
     LaunchedEffect(typ) {
@@ -24,15 +26,22 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel) {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Szlaki") }) }
+        topBar = { TopAppBar(
+            title = { Text("Szlaki") },
+            actions = {
+                IconButton(onClick = { navController.navigate("profile") }) {
+                    Icon(Icons.Filled.Person, contentDescription = "Twój Profil")
+                }
+            }
+        ) }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
-                Button(onClick = { typ = "gorskie" }) { Text("Górskie") }
-                Button(onClick = { typ = "rowerowe" }) { Text("Rowerowe") }
+                Button(onClick = { vm.selectedTab.value = "gorskie" }) { Text("Górskie") }
+                Button(onClick = { vm.selectedTab.value = "rowerowe" }) { Text("Rowerowe") }
             }
 
             val naglowek = if (typ == "gorskie") "Szlaki górskie" else "Szlaki rowerowe"

@@ -4,76 +4,61 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.*
 import com.example.szlaki.ui.theme.SzlakiTheme
-import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Query
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Timer
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val database = AppDatabase.getInstance(this)
-        val repository = TrailRepository(database.trailDao())
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            val dbTrails = repository.getTrailsByType("hiking")
-            // Sprawdzamy czy baza jest pusta z małym uproszczeniem
-            repository.insertTrails(
-                listOf(
-                    TrailEntity(name = "Szlak na Rysy", type = "hiking", color = "red", difficulty = "hard", surface = "rock", operator = "TPN"),
-                    TrailEntity(name = "Dolina Chochołowska", type = "hiking", color = "green", difficulty = "easy", surface = "gravel", operator = "TPN"),
-                    TrailEntity(name = "Velo Dunajec", type = "bicycle", color = "blue", difficulty = "medium", surface = "asphalt", operator = "Małopolska")
-                )
-            )
-        }
+        val trailRepository = TrailRepository(database.trailDao())
+        val userRepository = UserRepository(database.userDao())
+        val themeVm = ThemeViewModel()
 
         enableEdgeToEdge()
         setContent {
-            SzlakiTheme {
-                MyApp(repository)
+            val darkTheme by themeVm.isDarkTheme.observeAsState(initial = false)
+            SzlakiTheme(darkTheme = darkTheme) {
+                MyApp(trailRepository, userRepository, themeVm)
             }
         }
     }
 }
 
 @Composable
-fun MyApp(repository: TrailRepository) {
+fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, themeVm: ThemeViewModel) {
     val navController = rememberNavController()
-    val vm: TrailsViewModel = viewModel(
-        factory = TrailsViewModel.Factory(repository)
+    val trailsVm: TrailsViewModel = viewModel(
+        factory = TrailsViewModel.Factory(trailRepository)
     )
 
-    NavHost(navController = navController, startDestination = "home") {
+    val authVm: AuthViewModel = viewModel(
+        factory = AuthViewModel.Factory(userRepository)
+    )
+
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(navController, authVm)
+        }
+
+        composable("register") {
+            RegisterScreen(navController, authVm)
+        }
+
         composable("home") {
-            HomeScreen(navController, vm)
+            HomeScreen(navController, trailsVm)
         }
 
         composable("details") {
-            DetailsScreen(navController, vm)
+            DetailsScreen(navController, trailsVm)
+        }
+
+        composable("profile") {
+            ProfileScreen(navController, authVm)
         }
     }
 }

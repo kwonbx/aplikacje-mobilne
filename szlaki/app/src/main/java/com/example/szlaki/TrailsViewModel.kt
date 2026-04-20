@@ -13,6 +13,7 @@ class TrailsViewModel(private val repository: TrailRepository): ViewModel() {
     val trails: LiveData<List<TrailEntity>> = currentType.switchMap { type -> repository.getTrailsByType(type) }
 
     val selectedTrail = mutableStateOf<TrailEntity?>(null)
+    var selectedTab = mutableStateOf("gorskie")
 
     fun fetchTrails(type: String) {
         val dbType = if (type == "gorskie") "hiking" else "bicycle"
