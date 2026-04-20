@@ -3,6 +3,7 @@ package com.example.szlaki
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -25,8 +27,9 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController, vm: AuthViewModel) {
+fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: ThemeViewModel) {
     val user by vm.currentUser.observeAsState()
+    val isDarkTheme by themeVm.isDarkTheme.observeAsState(initial = false)
 
     Scaffold(
         topBar = {
@@ -64,6 +67,20 @@ fun ProfileScreen(navController: NavController, vm: AuthViewModel) {
                 InfoRow(label = "Imię:", value = user!!.firstName)
                 InfoRow(label = "Nazwisko:", value = user!!.lastName)
                 InfoRow(label = "Data urodzenia:", value = user!!.birthDate)
+
+                HorizontalDivider()
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Motyw ciemny", style = MaterialTheme.typography.bodyLarge)
+                    Switch(
+                        checked = isDarkTheme,
+                        onCheckedChange = { themeVm.toggleTheme() }
+                    )
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 

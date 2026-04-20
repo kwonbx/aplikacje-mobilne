@@ -58,7 +58,7 @@ fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, them
         }
 
         composable("profile") {
-            ProfileScreen(navController, authVm)
+            ProfileScreen(navController, authVm, themeVm)
         }
     }
 }
