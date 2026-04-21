@@ -2,6 +2,7 @@ package com.example.szlaki
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -10,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.szlaki.TrailsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,15 +22,15 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel) {
             TopAppBar(
                 title = { Text("Szczegóły szlaku") },
                 navigationIcon = {
-                    Button(onClick = { navController.popBackStack() }) {
-                        Text("<")
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wróć")
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Twoja akcja stoper */ },
+                onClick = { navController.navigate("timer") },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(Icons.Filled.Timer, contentDescription = "Stoper")
@@ -58,9 +58,7 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel) {
                         label = { Text(if (trail.type == "hiking") "Pieszy" else "Rowerowy") }
                     )
                     Spacer(Modifier.width(8.dp))
-                    if (trail.color != null) {
-                        Text("Kolor: ${trail.color.uppercase()}", fontWeight = FontWeight.Bold)
-                    }
+                    Text("Kolor: ${trail.color.uppercase()}", fontWeight = FontWeight.Bold)
                 }
 
                 HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)

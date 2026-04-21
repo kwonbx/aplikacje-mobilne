@@ -18,19 +18,20 @@ class MainActivity : ComponentActivity() {
         val trailRepository = TrailRepository(database.trailDao())
         val userRepository = UserRepository(database.userDao())
         val themeVm = ThemeViewModel()
+        val timerVm = TimerViewModel()
 
         enableEdgeToEdge()
         setContent {
             val darkTheme by themeVm.isDarkTheme.observeAsState(initial = false)
             SzlakiTheme(darkTheme = darkTheme) {
-                MyApp(trailRepository, userRepository, themeVm)
+                MyApp(trailRepository, userRepository, themeVm, timerVm)
             }
         }
     }
 }
 
 @Composable
-fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, themeVm: ThemeViewModel) {
+fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, themeVm: ThemeViewModel, timerVm: TimerViewModel) {
     val navController = rememberNavController()
     val trailsVm: TrailsViewModel = viewModel(
         factory = TrailsViewModel.Factory(trailRepository)
@@ -39,6 +40,8 @@ fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, them
     val authVm: AuthViewModel = viewModel(
         factory = AuthViewModel.Factory(userRepository)
     )
+
+
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -59,6 +62,10 @@ fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, them
 
         composable("profile") {
             ProfileScreen(navController, authVm, themeVm)
+        }
+
+        composable("timer") {
+            TimerScreen(navController, trailsVm, timerVm)
         }
     }
 }
