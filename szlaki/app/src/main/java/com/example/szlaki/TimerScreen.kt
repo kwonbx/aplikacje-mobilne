@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,10 +27,16 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimerScreen(navController: NavController, trailsVm: TrailsViewModel, timerVm: TimerViewModel) {
+fun TimerScreen(navController: NavController, trailsVm: TrailsViewModel, timerVm: TimerViewModel, authVm: AuthViewModel) {
     val trail = trailsVm.selectedTrail.value
-    val time by timerVm.timeMillis.observeAsState(0L)
-    val isRecording by timerVm.isRecording.observeAsState(false)
+    val trailName = trail?.name ?: "Nieznany szlak"
+    val timersMap by timerVm.timers.collectAsState()
+    val timerState = timersMap[trailName] ?: TrailTimerState()
+
+    val time = timerState.timeMillis
+    val isRecording = timerState.isRecording
+
+    val user by authVm.currentUser.observeAsState()
 
     Scaffold(
         topBar = {
@@ -72,14 +79,14 @@ fun TimerScreen(navController: NavController, trailsVm: TrailsViewModel, timerVm
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
-                    onClick = { timerVm.reset() },
+                    onClick = { timerVm.reset(trailName) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
                     Text("Reset")
                 }
 
                 Button(
-                    onClick = { timerVm.toggle() },
+                    onClick = { timerVm.toggle(trailName) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text(if (isRecording) "Pauza" else "Start")
@@ -90,9 +97,17 @@ fun TimerScreen(navController: NavController, trailsVm: TrailsViewModel, timerVm
 
             OutlinedButton(
                 onClick = {
-                    /* zapis */
+                    user?.login?.let { login ->
+                        timerVm.saveRecord(
+                            userLogin = login,
+                            trailName = trailName,
+                            trailType = trail?.type ?: "hiking"
+                        )
+                        navController.popBackStack()
+                    }
                 },
-                modifier = Modifier.fillMaxWidth(0.8f)
+                modifier = Modifier.fillMaxWidth(0.8f),
+                enabled = time > 0L
             ) {
                 Text("Zapisz czas w profilu")
             }

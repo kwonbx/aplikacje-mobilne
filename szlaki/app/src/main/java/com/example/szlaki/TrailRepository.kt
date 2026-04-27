@@ -7,6 +7,10 @@ class TrailRepository(private val trailDao: TrailDao) {
         return trailDao.getTrailsByType(type)
     }
 
+    fun getAllTrails(): LiveData<List<TrailEntity>> {
+        return trailDao.getAllTrails()
+    }
+
     suspend fun insertTrails(trails: List<TrailEntity>) {
         trailDao.insertTrails(trails)
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -84,6 +85,24 @@ fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: Them
                         checked = isDarkTheme,
                         onCheckedChange = { themeVm.toggleTheme() }
                     )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { navController.navigate("records") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                ) {
+                    Text("Zapisane czasy")
+                }
+
+                Button(
+                    onClick = { navController.navigate("favorites") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                ) {
+                    Text("Ulubione szlaki")
                 }
 
                 Spacer(modifier = Modifier.weight(1f))

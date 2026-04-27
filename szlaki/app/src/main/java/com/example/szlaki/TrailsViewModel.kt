@@ -8,16 +8,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.switchMap
 
 class TrailsViewModel(private val repository: TrailRepository): ViewModel() {
-    private val currentType = MutableLiveData<String>("hiking")
+    private val currentType = MutableLiveData<String?>("hiking")
 
-    val trails: LiveData<List<TrailEntity>> = currentType.switchMap { type -> repository.getTrailsByType(type) }
+    val trails: LiveData<List<TrailEntity>> = currentType.switchMap { type ->
+        if (type == null) repository.getAllTrails() else repository.getTrailsByType(type)
+    }
 
     val selectedTrail = mutableStateOf<TrailEntity?>(null)
-    var selectedTab = mutableStateOf("gorskie")
+    var selectedTab = mutableStateOf("wszystkie")
 
     fun fetchTrails(type: String) {
-        val dbType = if (type == "gorskie") "hiking" else "bicycle"
-        currentType.value = dbType
+        currentType.value = when(type) {
+            "gorskie" -> "hiking"
+            "rowerowe" -> "bicycle"
+            else -> null
+        }
     }
 
     class Factory(private val repository: TrailRepository) : ViewModelProvider.Factory {

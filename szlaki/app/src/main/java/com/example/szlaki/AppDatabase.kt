@@ -2,16 +2,17 @@ package com.example.szlaki
 
 import android.content.Context
 import androidx.room.*
-import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [TrailEntity::class, UserEntity::class], version = 2)
+@Database(entities = [TrailEntity::class, UserEntity::class, RecordEntity::class, FavoriteTrailEntity::class], version = 5)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun trailDao(): TrailDao
     abstract fun userDao(): UserDao
+    abstract fun recordDao(): RecordDao
+    abstract fun favoriteTrailDao(): FavoriteTrailDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

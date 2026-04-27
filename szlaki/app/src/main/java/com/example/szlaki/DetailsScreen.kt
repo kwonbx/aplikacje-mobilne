@@ -30,8 +30,11 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("timer") },
-                containerColor = MaterialTheme.colorScheme.primary
+                onClick = {
+                    navController.navigate("timer")
+                },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
                 Icon(Icons.Filled.Timer, contentDescription = "Stoper")
             }
