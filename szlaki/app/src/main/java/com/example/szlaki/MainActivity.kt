@@ -4,8 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.szlaki.ui.theme.SzlakiTheme
@@ -40,7 +48,20 @@ fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, them
     val timerVm: TimerViewModel = viewModel(factory = TimerViewModel.Factory(recordRepository))
     val favVm: FavoritesViewModel = viewModel(factory = FavoritesViewModel.Factory(favRepository))
 
-    NavHost(navController = navController, startDestination = "login") {
+    val configuration = LocalConfiguration.current
+    val isTablet = configuration.screenWidthDp >= 600
+
+    LaunchedEffect(isTablet) {
+        if (isTablet && navController.currentDestination?.route == "details") {
+            navController.popBackStack("home", inclusive = false)
+        }
+    }
+
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash") {
+            SplashScreen(navController)
+        }
+
         composable("login") {
             LoginScreen(navController, authVm)
         }
@@ -50,11 +71,36 @@ fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, them
         }
 
         composable("home") {
-            HomeScreen(navController, trailsVm, authVm, favVm)
+            if (isTablet) {
+                Row(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        HomeScreen(navController, trailsVm, authVm, favVm, onTrailClick = { trail ->
+                            trailsVm.selectedTrail.value = trail
+                        })
+                    }
+
+                    VerticalDivider()
+
+                    Box(modifier = Modifier.weight(1.5f)) {
+                        if (trailsVm.selectedTrail.value == null) {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Wybierz szlak z listy po lewej")
+                            }
+                        } else {
+                            DetailsScreen(navController, trailsVm, isTablet = true)
+                        }
+                    }
+                }
+            } else {
+                HomeScreen(navController, trailsVm, authVm, favVm, onTrailClick = { trail ->
+                    trailsVm.selectedTrail.value = trail
+                    navController.navigate("details")
+                })
+            }
         }
 
         composable("details") {
-            DetailsScreen(navController, trailsVm)
+            DetailsScreen(navController, trailsVm, isTablet = false)
         }
 
         composable("profile") {

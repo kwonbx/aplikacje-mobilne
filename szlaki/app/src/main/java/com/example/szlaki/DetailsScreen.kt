@@ -14,7 +14,7 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsScreen(navController: NavController, vm: TrailsViewModel) {
+fun DetailsScreen(navController: NavController, vm: TrailsViewModel, isTablet: Boolean = false) {
     val trail = vm.selectedTrail.value
 
     Scaffold(
@@ -22,8 +22,10 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel) {
             TopAppBar(
                 title = { Text("Szczegóły szlaku") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wróć")
+                    if (!isTablet) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Wróć")
+                        }
                     }
                 }
             )

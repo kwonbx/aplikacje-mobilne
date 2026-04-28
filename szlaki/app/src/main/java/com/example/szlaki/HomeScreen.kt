@@ -7,12 +7,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Hiking
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -21,16 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.szlaki.TrailsViewModel
+import androidx.compose.runtime.saveable.rememberSaveable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthViewModel, favVm: FavoritesViewModel) {
+fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthViewModel, favVm: FavoritesViewModel, onTrailClick: (TrailEntity) -> Unit) {
     val typ = vm.selectedTab.value
     val trails by vm.trails.observeAsState(initial = emptyList())
 
-    var isSearchActive by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
 
     val user by authVm.currentUser.observeAsState()
     val login = user?.login ?: ""
@@ -106,7 +105,7 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
                         modifier = Modifier.weight(1f),
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Terrain,
+                            imageVector = Icons.Filled.Hiking,
                             contentDescription = "Szlaki górskie"
                         )
                     }
@@ -153,8 +152,7 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
                                 .clickable {
-                                    vm.selectedTrail.value = trail
-                                    navController.navigate("details")
+                                    onTrailClick(trail)
                                 }
                         ) {
                             Row(
@@ -172,7 +170,7 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
 
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = if (trail.type == "hiking") Icons.Filled.Terrain else Icons.AutoMirrored.Filled.DirectionsBike,
+                                        imageVector = if (trail.type == "hiking") Icons.Filled.Hiking else Icons.AutoMirrored.Filled.DirectionsBike,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.secondary,
                                         modifier = Modifier.size(24.dp)
