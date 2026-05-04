@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +50,7 @@ fun RegisterScreen(navController: NavController, vm: AuthViewModel) {
     val datePickerState = rememberDatePickerState()
 
     val message by vm.message.observeAsState()
+    val scrollState = rememberScrollState()
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -76,7 +79,7 @@ fun RegisterScreen(navController: NavController, vm: AuthViewModel) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(32.dp),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(32.dp).verticalScroll(scrollState),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

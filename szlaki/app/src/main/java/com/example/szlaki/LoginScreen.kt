@@ -52,16 +52,14 @@ fun LoginScreen(navController: NavController, vm: AuthViewModel) {
         OutlinedTextField(
             value = login,
             onValueChange = { login = it },
-            label = { Text("Login") },
-            modifier = Modifier.fillMaxWidth()
+            label = { Text("Login") }
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Hasło") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            visualTransformation = PasswordVisualTransformation()
         )
 
         if (message != null) {
@@ -70,8 +68,7 @@ fun LoginScreen(navController: NavController, vm: AuthViewModel) {
 
         Spacer(Modifier.height(16.dp))
         Button(
-            onClick = { vm.login(login, password) },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { vm.login(login, password) }
         ) {
             Text("Zaloguj się")
         }

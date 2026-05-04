@@ -1,7 +1,9 @@
 package com.example.szlaki
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Timer
@@ -20,6 +22,7 @@ import coil.compose.AsyncImage
 @Composable
 fun DetailsScreen(navController: NavController, vm: TrailsViewModel, isTablet: Boolean = false) {
     val trail = vm.selectedTrail.value
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -56,7 +59,8 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel, isTablet: B
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(trail.name, style = MaterialTheme.typography.headlineMedium)
@@ -78,13 +82,17 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel, isTablet: B
 
                 Spacer(Modifier.height(16.dp))
 
+                val imageHeight = if (isTablet) 280.dp else 220.dp
+                val imageWidth = if (isTablet) 600.dp else 400.dp
+
                 AsyncImage(
                     model = trail.imageUrl,
                     contentDescription = "Szczegółowe zdjęcie szlaku",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp)
-                        .clip(RoundedCornerShape(12.dp)),
+                        .width(imageWidth)
+                        .height(imageHeight)
+                        .clip(RoundedCornerShape(12.dp))
+                        .align(Alignment.CenterHorizontally),
                     contentScale = ContentScale.Crop
                 )
             }

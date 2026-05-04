@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
@@ -91,10 +93,12 @@ fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, them
 
                     VerticalDivider()
 
-                    Box(modifier = Modifier.weight(1.5f)) {
+                    Box(modifier = Modifier.weight(1f)) {
                         if (trailsVm.selectedTrail.value == null) {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text("Wybierz szlak z listy po lewej")
+                            Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
+                                Text(text = "Wybierz szlak z listy po lewej",
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    style = MaterialTheme.typography.bodyLarge)
                             }
                         } else {
                             DetailsScreen(navController, trailsVm, isTablet = true)
