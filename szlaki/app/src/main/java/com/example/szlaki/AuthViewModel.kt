@@ -1,5 +1,6 @@
 package com.example.szlaki
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,7 +10,7 @@ import com.example.szlaki.UserEntity
 import com.example.szlaki.UserRepository
 import kotlinx.coroutines.launch
 
-class AuthViewModel(private val repository: UserRepository): ViewModel() {
+class AuthViewModel(private val repository: UserRepository, private val sharedPrefs: SharedPreferences): ViewModel() {
     private val _message = MutableLiveData<String?>(null)
     val message: LiveData<String?> = _message
 
@@ -19,11 +20,33 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
     private val _currentUser = MutableLiveData<UserEntity?>(null)
     val currentUser: LiveData<UserEntity?> = _currentUser
 
-    fun login(login: String, pass: String) {
+    init {
+        tryAutoLogin()
+    }
+
+    private fun tryAutoLogin() {
+        val savedLogin = sharedPrefs.getString("SAVED_LOGIN", null)
+        if (savedLogin != null) {
+            viewModelScope.launch {
+                val user = repository.getUserByLogin(savedLogin)
+                if (user != null) {
+                    _currentUser.value = user
+                    _isLoggedIn.value = true
+                }
+            }
+        }
+    }
+
+    fun login(login: String, pass: String, rememberMe: Boolean) {
         viewModelScope.launch {
             val user = repository.loginUser(login, pass)
             if (user != null) {
                 _currentUser.value = user
+
+                if (rememberMe) {
+                    sharedPrefs.edit().putString("SAVED_LOGIN", user.login).apply()
+                }
+
                 _isLoggedIn.value = true
                 _message.value = null
             } else {
@@ -33,6 +56,7 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
     }
 
     fun logout() {
+        sharedPrefs.edit().remove("SAVED_LOGIN").apply()
         _currentUser.value = null
         _isLoggedIn.value = false
     }
@@ -66,11 +90,11 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
         }
     }
 
-    class Factory(private val repository: UserRepository) : ViewModelProvider.Factory {
+    class Factory(private val repository: UserRepository, private val sharedPrefs: SharedPreferences) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
                @Suppress("UNCHECKED_CAST")
-               return AuthViewModel(repository) as T
+               return AuthViewModel(repository, sharedPrefs) as T
             }
         throw IllegalArgumentException("Unknown ViewModel class")
         }

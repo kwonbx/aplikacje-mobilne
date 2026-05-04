@@ -13,4 +13,7 @@ interface UserDao {
 
     @Query("UPDATE users SET isDarkTheme = :isDarkTheme WHERE login = :login")
     suspend fun updateUserTheme(login: String, isDarkTheme: Boolean)
+
+    @Query("SELECT * FROM users WHERE login = :login")
+    suspend fun getUserByLogin(login: String): UserEntity?
 }

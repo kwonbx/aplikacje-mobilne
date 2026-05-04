@@ -45,7 +45,8 @@ fun RecordsScreen(navController: NavController, authVm: AuthViewModel, recordsVm
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(records) { record ->
                     RecordItem(record, recordsVm)
@@ -61,7 +62,7 @@ fun RecordItem(record: RecordEntity, recordsVm: RecordsViewModel) {
     val dateString = dateFormat.format(Date(record.dateMillis))
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.widthIn(max = 700.dp).fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Row(

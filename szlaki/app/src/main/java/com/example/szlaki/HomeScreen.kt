@@ -1,5 +1,6 @@
 package com.example.szlaki
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Hiking
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
@@ -24,6 +26,7 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +41,13 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
     val user by authVm.currentUser.observeAsState()
     val login = user?.login ?: ""
     val favoriteNames by favVm.getFavoriteTrailNames(login).observeAsState(emptyList())
+
+    val configuration = LocalConfiguration.current
+    val isTablet = configuration.smallestScreenWidthDp >= 600
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val showCompactMenu = isLandscape && !isTablet
+
+    var filterMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(typ) {
         vm.fetchTrails(typ)
@@ -70,6 +80,30 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
                 }
             },
             actions = {
+                if (showCompactMenu) {
+                    Box {
+                        IconButton(onClick = { filterMenuExpanded = true }) {
+                            Icon(Icons.Filled.FilterList, contentDescription = "Filtruj")
+                        }
+                        DropdownMenu(
+                            expanded = filterMenuExpanded,
+                            onDismissRequest = { filterMenuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Wszystkie szlaki") },
+                                onClick = { vm.selectedTab.value = "wszystkie"; filterMenuExpanded = false }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Szlaki Górskie") },
+                                onClick = { vm.selectedTab.value = "gorskie"; filterMenuExpanded = false }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Szlaki Rowerowe") },
+                                onClick = { vm.selectedTab.value = "rowerowe"; filterMenuExpanded = false }
+                            )
+                        }
+                    }
+                }
                 if (isSearchActive) {
                     IconButton(onClick = {
                         if (searchQuery.isNotEmpty()) {
@@ -92,36 +126,39 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
         ) }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            Column(modifier = Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Button(
-                    onClick = { vm.selectedTab.value = "wszystkie" },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Wszystkie", style = MaterialTheme.typography.labelSmall)
-                }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(0.6f),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
-                ) {
+             if(!showCompactMenu) {
+                Column(modifier = Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Button(
-                        onClick = { vm.selectedTab.value = "gorskie" },
-                        modifier = Modifier.weight(1f),
+                        onClick = { vm.selectedTab.value = "wszystkie" },
+                        modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth().align(Alignment.CenterHorizontally),
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Hiking,
-                            contentDescription = "Szlaki górskie"
-                        )
+                        Text("Wszystkie", style = MaterialTheme.typography.labelSmall)
                     }
 
-                    Button(
-                        onClick = { vm.selectedTab.value = "rowerowe" },
-                        modifier = Modifier.weight(1f),
+                    Row(
+                        modifier = Modifier.fillMaxWidth(0.6f),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
-                            contentDescription = "Szlaki rowerowe"
-                        )
+                        Button(
+                            onClick = { vm.selectedTab.value = "gorskie" },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Hiking,
+                                contentDescription = "Szlaki górskie"
+                            )
+                        }
+
+                        Button(
+                            onClick = { vm.selectedTab.value = "rowerowe" },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
+                                contentDescription = "Szlaki rowerowe"
+                            )
+                        }
                     }
                 }
             }

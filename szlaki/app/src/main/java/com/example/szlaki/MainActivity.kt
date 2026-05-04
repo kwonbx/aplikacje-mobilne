@@ -1,5 +1,7 @@
 package com.example.szlaki
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,23 +31,24 @@ class MainActivity : ComponentActivity() {
         val userRepository = UserRepository(database.userDao())
         val recordRepository = RecordRepository(database.recordDao())
         val favRepository = FavoriteTrailRepository(database.favoriteTrailDao())
+        val sharedPreferences = getSharedPreferences("SzlakiPrefs", Context.MODE_PRIVATE)
 
         enableEdgeToEdge()
         setContent {
             val themeVm: ThemeViewModel = viewModel()
             val darkTheme by themeVm.isDarkTheme.observeAsState(initial = false)
             SzlakiTheme(darkTheme = darkTheme) {
-                MyApp(trailRepository, userRepository, themeVm, recordRepository, favRepository)
+                MyApp(trailRepository, userRepository, themeVm, recordRepository, favRepository, sharedPreferences)
             }
         }
     }
 }
 
 @Composable
-fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, themeVm: ThemeViewModel, recordRepository: RecordRepository, favRepository: FavoriteTrailRepository) {
+fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, themeVm: ThemeViewModel, recordRepository: RecordRepository, favRepository: FavoriteTrailRepository, sharedPrefs: SharedPreferences) {
     val navController = rememberNavController()
     val trailsVm: TrailsViewModel = viewModel(factory = TrailsViewModel.Factory(trailRepository))
-    val authVm: AuthViewModel = viewModel(factory = AuthViewModel.Factory(userRepository))
+    val authVm: AuthViewModel = viewModel(factory = AuthViewModel.Factory(userRepository, sharedPrefs))
     val recordsVm: RecordsViewModel = viewModel(factory = RecordsViewModel.Factory(recordRepository))
     val timerVm: TimerViewModel = viewModel(factory = TimerViewModel.Factory(recordRepository))
     val favVm: FavoritesViewModel = viewModel(factory = FavoritesViewModel.Factory(favRepository))

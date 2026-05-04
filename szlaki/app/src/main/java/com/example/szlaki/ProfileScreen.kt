@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -35,6 +38,7 @@ import androidx.navigation.NavController
 fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: ThemeViewModel) {
     val user by vm.currentUser.observeAsState()
     val isDarkTheme by themeVm.isDarkTheme.observeAsState(initial = false)
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -57,7 +61,8 @@ fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: Them
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
@@ -94,7 +99,7 @@ fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: Them
 
                 Button(
                     onClick = { navController.navigate("records") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth().align(Alignment.CenterHorizontally),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
                     Text("Zapisane czasy")
@@ -102,7 +107,7 @@ fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: Them
 
                 Button(
                     onClick = { navController.navigate("favorites") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth().align(Alignment.CenterHorizontally),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
                 ) {
                     Text("Ulubione szlaki")
@@ -117,7 +122,7 @@ fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: Them
                             popUpTo(0)
                         }
                     },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.widthIn(max = 500.dp).fillMaxWidth().align(Alignment.CenterHorizontally),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
                     Text("Wyloguj się")

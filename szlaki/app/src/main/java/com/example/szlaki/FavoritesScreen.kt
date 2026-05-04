@@ -47,10 +47,11 @@ fun FavoritesScreen(navController: NavController, authVm: AuthViewModel, favVm: 
                 Text("Brak ulubionych szlaków.")
             }
         } else {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp)) {
+            LazyColumn(modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 items(favoriteTrails) { trail ->
                     Card(
                         modifier = Modifier
+                            .widthIn(max = 700.dp)
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .clickable {
