@@ -23,9 +23,9 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
         viewModelScope.launch {
             val user = repository.loginUser(login, pass)
             if (user != null) {
+                _currentUser.value = user
                 _isLoggedIn.value = true
                 _message.value = null
-                _currentUser.value = user
             } else {
                 _message.value = "Nieprawidłowy login lub hasło."
             }
@@ -55,6 +55,15 @@ class AuthViewModel(private val repository: UserRepository): ViewModel() {
 
     fun clearMessage() {
         _message.value = null
+    }
+
+    fun updateThemePreference(isDark: Boolean) {
+        val user = _currentUser.value ?: return
+
+        viewModelScope.launch {
+            repository.updateUserTheme(user.login, isDark)
+            _currentUser.value = user.copy(isDarkTheme = isDark)
+        }
     }
 
     class Factory(private val repository: UserRepository) : ViewModelProvider.Factory {

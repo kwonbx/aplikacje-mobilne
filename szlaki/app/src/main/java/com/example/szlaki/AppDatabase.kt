@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [TrailEntity::class, UserEntity::class, RecordEntity::class, FavoriteTrailEntity::class], version = 5)
+@Database(entities = [TrailEntity::class, UserEntity::class, RecordEntity::class, FavoriteTrailEntity::class], version = 6)
 abstract class AppDatabase: RoomDatabase() {
     abstract fun trailDao(): TrailDao
     abstract fun userDao(): UserDao

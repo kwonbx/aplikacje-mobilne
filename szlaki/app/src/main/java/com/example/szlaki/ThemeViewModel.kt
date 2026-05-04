@@ -8,7 +8,7 @@ class ThemeViewModel : ViewModel() {
     private val _isDarkTheme = MutableLiveData(false)
     val isDarkTheme: LiveData<Boolean> = _isDarkTheme
 
-    fun toggleTheme() {
-        _isDarkTheme.value = !(_isDarkTheme.value ?: false)
+    fun setTheme(isDark: Boolean) {
+        _isDarkTheme.value = isDark
     }
 }

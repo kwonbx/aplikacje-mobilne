@@ -83,7 +83,10 @@ fun ProfileScreen(navController: NavController, vm: AuthViewModel, themeVm: Them
                     Text("Motyw ciemny", style = MaterialTheme.typography.bodyLarge)
                     Switch(
                         checked = isDarkTheme,
-                        onCheckedChange = { themeVm.toggleTheme() }
+                        onCheckedChange = { isChecked ->
+                            themeVm.setTheme(isChecked)
+                            vm.updateThemePreference(isChecked)
+                        }
                     )
                 }
 

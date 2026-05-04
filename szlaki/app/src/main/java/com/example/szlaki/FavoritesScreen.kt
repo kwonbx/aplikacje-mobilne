@@ -52,7 +52,8 @@ fun FavoritesScreen(navController: NavController, authVm: AuthViewModel, favVm: 
                             .clickable {
                                 trailsVm.selectedTrail.value = trail
                                 navController.navigate("details")
-                            }
+                            },
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -69,7 +70,7 @@ fun FavoritesScreen(navController: NavController, authVm: AuthViewModel, favVm: 
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 IconButton(onClick = { favVm.toggleFavorite(login, trail.name, true) }) {
-                                    Icon(Icons.Filled.Favorite, contentDescription = "Usuń z ulubionych", tint = Color(0xFFE91E63))
+                                    Icon(Icons.Filled.Favorite, contentDescription = "Usuń z ulubionych", tint = Color(0xFFCC5470))
                                 }
                             }
                         }

@@ -9,18 +9,30 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    background = Color(0xFF2B382B),
+    surface = Color(0xFF2B382B),
+    primary = Color(0xFFBBE8BB),
+    secondary = Color(0xFFA4D9A4),
+    tertiary = Color(0xFF86CEB0),
+    surfaceVariant = Color(0xFF3A4D3A),
+    error = Color(0xFFF17F7F),
+    onPrimary = Color.Black,
+    onSecondary = Color.Black
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    background = Color(0xFFE0FDE0),
+    surface = Color(0xFFE0FDE0),
+    primary = Color(0xFF335233),
+    secondary = Color(0xFF557255),
+    tertiary = Color(0xFF527E6B),
+    surfaceVariant = Color(0xFFC2E3C2),
+    error = Color(0xFFCB5A5A)
+
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -37,7 +49,7 @@ private val LightColorScheme = lightColorScheme(
 fun SzlakiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

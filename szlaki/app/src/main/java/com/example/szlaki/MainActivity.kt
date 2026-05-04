@@ -27,10 +27,10 @@ class MainActivity : ComponentActivity() {
         val userRepository = UserRepository(database.userDao())
         val recordRepository = RecordRepository(database.recordDao())
         val favRepository = FavoriteTrailRepository(database.favoriteTrailDao())
-        val themeVm = ThemeViewModel()
 
         enableEdgeToEdge()
         setContent {
+            val themeVm: ThemeViewModel = viewModel()
             val darkTheme by themeVm.isDarkTheme.observeAsState(initial = false)
             SzlakiTheme(darkTheme = darkTheme) {
                 MyApp(trailRepository, userRepository, themeVm, recordRepository, favRepository)
@@ -48,12 +48,22 @@ fun MyApp(trailRepository: TrailRepository, userRepository: UserRepository, them
     val timerVm: TimerViewModel = viewModel(factory = TimerViewModel.Factory(recordRepository))
     val favVm: FavoritesViewModel = viewModel(factory = FavoritesViewModel.Factory(favRepository))
 
+    val user by authVm.currentUser.observeAsState()
+
     val configuration = LocalConfiguration.current
     val isTablet = configuration.screenWidthDp >= 600
 
     LaunchedEffect(isTablet) {
         if (isTablet && navController.currentDestination?.route == "details") {
             navController.popBackStack("home", inclusive = false)
+        }
+    }
+
+    LaunchedEffect(user) {
+        if (user != null) {
+            themeVm.setTheme(user!!.isDarkTheme)
+        } else {
+            themeVm.setTheme(false)
         }
     }
 

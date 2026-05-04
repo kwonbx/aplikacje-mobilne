@@ -153,7 +153,8 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
                                 .padding(vertical = 4.dp)
                                 .clickable {
                                     onTrailClick(trail)
-                                }
+                                },
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {
                             Row(
                                 modifier = Modifier
@@ -184,7 +185,7 @@ fun HomeScreen(navController: NavController, vm: TrailsViewModel, authVm: AuthVi
                                         Icon(
                                             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                                             contentDescription = "Ulubione",
-                                            tint = if (isFavorite) Color(0xFFE91E63) else MaterialTheme.colorScheme.outline
+                                            tint = if (isFavorite) Color(0xFFCC5470) else MaterialTheme.colorScheme.outline
                                         )
                                     }
                                 }

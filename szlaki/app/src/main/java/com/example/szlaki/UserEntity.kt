@@ -8,5 +8,6 @@ data class UserEntity(
     val password: String,
     val firstName: String,
     val lastName: String,
-    val birthDate: String
+    val birthDate: String,
+    val isDarkTheme: Boolean = false
 )

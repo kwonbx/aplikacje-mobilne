@@ -1,5 +1,6 @@
 package com.example.szlaki
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -75,7 +76,7 @@ fun RegisterScreen(navController: NavController, vm: AuthViewModel) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(32.dp),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -92,7 +93,6 @@ fun RegisterScreen(navController: NavController, vm: AuthViewModel) {
             onValueChange = { },
             readOnly = true,
             label = { Text("Data urodzenia") },
-            modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = { showDatePicker = true }) {
                     Icon(Icons.Filled.DateRange, contentDescription = "Wybierz datę")

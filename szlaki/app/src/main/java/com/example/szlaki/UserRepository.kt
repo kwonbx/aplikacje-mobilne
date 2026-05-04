@@ -9,4 +9,8 @@ class UserRepository(private val userDao: UserDao) {
     suspend fun loginUser(login: String, pass: String): UserEntity? {
         return userDao.getUser(login, pass)
     }
+
+    suspend fun updateUserTheme(login: String, isDarkTheme: Boolean) {
+        userDao.updateUserTheme(login, isDarkTheme)
+    }
 }
