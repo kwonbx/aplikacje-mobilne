@@ -8,5 +8,6 @@ data class TrailEntity(
     val surface: String,
     val difficulty: String,
     val color: String,
-    val operator: String
+    val operator: String,
+    val imageUrl: String? = null
 )

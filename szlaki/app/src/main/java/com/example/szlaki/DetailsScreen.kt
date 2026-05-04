@@ -1,6 +1,7 @@
 package com.example.szlaki
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Timer
@@ -8,9 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +75,18 @@ fun DetailsScreen(navController: NavController, vm: TrailsViewModel, isTablet: B
                 InfoRow(label = "Trudność", value = trail.difficulty ?: "Brak danych")
                 InfoRow(label = "Nawierzchnia", value = trail.surface ?: "Naturalna/Brak danych")
                 InfoRow(label = "Zarządca", value = trail.operator ?: "Lokalny")
+
+                Spacer(Modifier.height(16.dp))
+
+                AsyncImage(
+                    model = trail.imageUrl,
+                    contentDescription = "Szczegółowe zdjęcie szlaku",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
             }
         }
     }
